@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Muzei Heroes</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="source_name">Muzei Heroes</string>
+    <string name="source_description">Use Marvel API to get images :)</string>
+
+</resources>
