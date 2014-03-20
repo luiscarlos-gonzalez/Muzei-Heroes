@@ -7,7 +7,7 @@ import retrofit.http.Query;
 
 public interface MarvelAPI {
 	@GET("/v1/public/characters")
-	MarvelResponse getCharacters(@Query("ts") String timestamp, @Query("hash") String hash, @Query("apikey") String apikey);
+	MarvelResponse getCharacters(@Query("ts") String timestamp, @Query("hash") String hash, @Query("apikey") String apikey, @Query("limit") String limit, @Query("offset") String offset);
 	
 	static class MarvelResponse{
 		Data data;
@@ -22,10 +22,17 @@ public interface MarvelAPI {
 		String name;
 		String description;
 		Thumbnail thumbnail;
+		List<Urls> urls;
+		
 	}
 	
 	static class Thumbnail{
 		String path;
 		String extension;
+	}
+	
+	static class Urls{
+		String type;
+		String url;
 	}
 }

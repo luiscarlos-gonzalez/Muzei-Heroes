@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MuzeiHeroesArtSource extends RemoteMuzeiArtSource {
 	
@@ -75,7 +76,7 @@ public class MuzeiHeroesArtSource extends RemoteMuzeiArtSource {
         	byte[] hash = md.digest(dataToHash.getBytes());
         	BigInteger bigInt = new BigInteger(1,hash);
         	String hashtext = bigInt.toString(16);
-        	response = service.getCharacters(ts.toString(), hashtext, "6b0b003c1e223740941e322c52292001");
+        	response = service.getCharacters(ts.toString(), hashtext, "6b0b003c1e223740941e322c52292001", String.valueOf(1), String.valueOf(Math.random()*1402));
         }catch(RetrofitError e){
         	Log.d(TAG, e.getResponse().getStatus()+" "+ e.getResponse().getReason()+" "+e.getResponse().getUrl());
         }
@@ -90,18 +91,27 @@ public class MuzeiHeroesArtSource extends RemoteMuzeiArtSource {
             return;
         }
         
-        Random random = new Random();
+      
         Results character;
         String token;
         while (true) {
-        	character = response.data.results.get(random.nextInt(response.data.results.size()));
+        	int random_number = (int) (Math.random()*response.data.results.size());
+        	Log.d(TAG, random_number+" de "+response.data.results.size()+" resultados");
+        	character = response.data.results.get(random_number);
             token = Integer.toString(character.id);
             if (response.data.results.size() <= 1 || !TextUtils.equals(token, currentToken)) {
                 break;
             }
         }
         
-        Log.d(TAG,character.thumbnail.path+"."+character.thumbnail.extension);
+        String photo_path = character.thumbnail.path+"."+character.thumbnail.extension;
+        
+        Log.d(TAG, photo_path);
+        
+        if (photo_path.contains("image_not_available")) {
+        	Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
+        	throw new RetryException();
+        }
 
         publishArtwork(new Artwork.Builder()
                 .title(character.name)
@@ -109,7 +119,7 @@ public class MuzeiHeroesArtSource extends RemoteMuzeiArtSource {
                 .imageUri(Uri.parse(character.thumbnail.path+"."+character.thumbnail.extension))
                 .token(token)
                 .viewIntent(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(character.thumbnail.path+"."+character.thumbnail.extension)))
+                        Uri.parse(character.urls.get(1).url)))
                 .build());
 
         scheduleUpdate(System.currentTimeMillis() + ROTATE_TIME_MILLIS);

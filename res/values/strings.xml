@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="source_name">Muzei Heroes</string>
     <string name="source_description">Use Marvel API to get images :)</string>
+    <string name="error">Sorry, no image for this character, try again</string>
 
 </resources>
