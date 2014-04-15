@@ -72,11 +72,11 @@ public class MuzeiHeroesArtSource extends RemoteMuzeiArtSource {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        	String dataToHash = ts.toString()+"e0f58eefb6fd81198f96f1c38f4682d49db8cce6"+"6b0b003c1e223740941e322c52292001";
+        	String dataToHash = ts.toString()+"e0f58eefb6fd81198f96f1c38f4682d49db8cce6"+"XXXXXXXXXXXXXXXXXXXXXXXXXXX";
         	byte[] hash = md.digest(dataToHash.getBytes());
         	BigInteger bigInt = new BigInteger(1,hash);
         	String hashtext = bigInt.toString(16);
-        	response = service.getCharacters(ts.toString(), hashtext, "6b0b003c1e223740941e322c52292001", String.valueOf(1), String.valueOf(Math.random()*1402));
+        	response = service.getCharacters(ts.toString(), hashtext, "XXXXXXXXXXXXXXXXXXXXXXXXXXX", String.valueOf(1), String.valueOf(Math.random()*1402));
         }catch(RetrofitError e){
         	Log.d(TAG, e.getResponse().getStatus()+" "+ e.getResponse().getReason()+" "+e.getResponse().getUrl());
         }
@@ -87,7 +87,8 @@ public class MuzeiHeroesArtSource extends RemoteMuzeiArtSource {
 
         if (response.data.results.size() == 0) {
             Log.w(TAG, "No photos returned from API.");
-            scheduleUpdate(System.currentTimeMillis() + ROTATE_TIME_MILLIS);
+            //scheduleUpdate(System.currentTimeMillis() + ROTATE_TIME_MILLIS);
+            scheduleUpdate(System.currentTimeMillis());
             return;
         }
         
@@ -110,17 +111,19 @@ public class MuzeiHeroesArtSource extends RemoteMuzeiArtSource {
         
         if (photo_path.contains("image_not_available")) {
         	Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_SHORT).show();
+            scheduleUpdate(System.currentTimeMillis());
         	throw new RetryException();
         }
 
-        publishArtwork(new Artwork.Builder()
-                .title(character.name)
-                .byline(character.description)
-                .imageUri(Uri.parse(character.thumbnail.path+"."+character.thumbnail.extension))
-                .token(token)
-                .viewIntent(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(character.urls.get(1).url)))
-                .build());
+   
+	    publishArtwork(new Artwork.Builder()
+	    	.title(character.name)
+	        .byline(character.description)
+	        .imageUri(Uri.parse(photo_path))
+	        .token(token)
+	        .viewIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(photo_path)))
+	        .build());
+
 
         scheduleUpdate(System.currentTimeMillis() + ROTATE_TIME_MILLIS);
 
